@@ -7,7 +7,7 @@
 #define VOLTAGEPIN A3
 #define BAUDRATE 9600
 #define LENGTHO 9
-#deinfe LENGTHI 2
+#define LENGTHI 2
 #define STX 0x06
 
 String m_in;
