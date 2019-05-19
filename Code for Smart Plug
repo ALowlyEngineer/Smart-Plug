@@ -41,3 +41,34 @@ def update_data(self):
         #self.volt_read.setText(self.volt_value + " V")  for formating the variable later on
         #self.curr_read.setText(self.curr_value + " A")        
         #self.power_read.setText(str(self.power_float)+ " W")
+        
+        #Writing to the Database example
+    
+        point= time.time() - start
+        c.execute("""INSERT INTO pedaling (power, time)  VALUES(?,?)""", (self.power_float, point))
+        conn.commit()
+        
+        c.execute("SELECT * FROM pedaling")
+        records =c.fetchall()
+        self.pwr = []
+        for column in records:
+            self.pwr.append(column[0])
+       
+
+        self.tme = []
+        for column in records:
+            self.tme.append(column[1])
+      
+
+        self.energy = np.trapz( self.pwr, x= self.tme)
+        self.energy = self.energy /(60 * 60) #to convert to hours
+       
+        self.cost_value = self.energy * .0873
+        self.cost_value = round(self.cost_value, 4)
+        self.cost_read.setText("$" + str( self.cost_value))
+       
+
+        ## Calorie calculations (860.421 kcal/ kWh)
+        self.cal_value = (self.energy) * 860.421
+        self.cal_value = round(self.cal_value, 3)
+        self.cal_read.setText( str(self.cal_value) + " kcal")
