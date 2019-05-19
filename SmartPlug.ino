@@ -6,6 +6,9 @@
 #define CURRENTPIN A0
 #define VOLTAGEPIN A3
 #define BAUDRATE 9600
+#define LENGTHO 9
+#deinfe LENGTHI 2
+#define STX 0x06
 
 String m_in;
 double rawValue = 0;
@@ -14,9 +17,22 @@ double current = 0;
 double current_max = 0;
 double startTime = 0;
 double curTime = 0;
+bool relayOn = 0;
 float supplyVoltage = 0;
   
 EnergyMonitor emon1;             // Create an instance
+
+byte msg_out[LENGTHO] =
+{ STX,                 //STX Byte
+  0x00,0x00,            //Voltage x 1000
+  0x00,0x00,            //Current x 1000
+  0x00,0x00,0x00, 0x00, //Time
+};
+
+byte msg_in[LENGTHI] = 
+{ STX,
+  0x00   // Relay Control Byte
+};
 
 void setup() {
   Serial.begin(BAUDRATE);
@@ -24,6 +40,7 @@ void setup() {
   pinMode(CURRENTPIN, INPUT);
 
   emon1.voltage(VOLTAGEPIN, VOLT_CAL, 1.7);  // Voltage: input pin, calibration, phase_shift
+  
   startTime = millis();
 }
 
@@ -51,6 +68,20 @@ void loop() {
     Serial.print("\t V = "); // shows the voltage measured 
     Serial.print(V_out,3); // the '3' after voltage allows you to display 3 digits after decimal point
     */
+   
+    msg_out[LENGTHO - 8] = (byte)((supplyVoltage*1000) >> 8);
+    msg_out[LENGTHO - 7] = (byte)(supplyVoltage*1000);
+      
+    msg_out[LENGTHO - 6] = (byte)((current*1000) >> 8);
+    msg_out[LENGTHO - 5] = (byte)(current*1000);
+   
+   
+    msg_out[LENGTHO - 4] = (byte)(curTime >> 24);
+    msg_out[LENGTHO - 3] = (byte)(curTime >> 16);
+    msg_out[LENGTHO - 2] = (byte)(curTime >> 8);
+    msg_out[LENGTHO - 1] = (byte)(curTime);
+   
+   /*
     Serial.print("\t Time = ");
     Serial.print(curTime);
    
@@ -59,7 +90,8 @@ void loop() {
    
     Serial.print("\t Vrms In = ");
     Serial.println(supplyVoltage);
-
+*/
+   Serial.write(msg_out, LENGTHO);
   }
   
 /*
@@ -71,26 +103,32 @@ Serial.println(digitalRead(5));
   delay(1000);
   */
 
-while(Serial.available() > 0){ // While there is a message on the serial port
+if(Serial.available() > (LENGTHI - 1)){ // While there is a message on the serial port
+  Serial.readBytes(msg_in, LENGTHI);
+  
+    relayOn = if (msg_in[LENGTHI-1] > 0);
+  /*
   char recv = Serial.read(); // log the current message
   if(recv == '\n'){ // If it's the end of the message
 
     //Print the message
     Serial.print("Received: ");
     Serial.println(m_in);
-
-    if(m_in == "CLOSE" || m_in=="C") {
+  */
+    if(relayOn) {
       digitalWrite(RELAY, LOW);
       }
-    else if(m_in == "OPEN" || m_in =="O"){
+    else if(!relayOn){
       digitalWrite(RELAY, HIGH);
       }
-    m_in = ""; // Clear the message
-    break;
+    relayOn = ""; // Clear the message
+   // break;
   }
   
+  /*
   else{ // Not at the end of the message
     m_in += recv; // Append the next character onto the message string
   }
+  */
 }
 }
