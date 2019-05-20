@@ -28,12 +28,14 @@ def update_data(self):
 
         #ser.write("rose") for testing
         ser.flush()
-        self.input= ser.readline()
-        self.volt_value= self.input.split(' ')[0] #change this to match the byte design you made
-        self.curr_value= self.input.split(' ')[1]
-        self.curr_value= self.curr_value.split('\n')[0]
-        self.curr_float = float(self.curr_value)
-        self.volt_float = float(self.volt_value)
+        self.input = ser.read(9) // Returns 9 bytes read as a bytes variable
+        self.volt_value = (self.input[1] << 8) + (self.input[2]) #change this to match the byte design you made
+        self.curr_value = (self.input[3] << 8) + (self.input[4])
+        self.time_value = (self.input[5] << 24) + (self.input[6] << 16) +\
+                          (self.input[7] << 8) + self.input[8]
+        self.curr_float = float(self.curr_value/1000)
+        self.volt_float = float(self.volt_value/1000)
+        self.time_float = float(self.time_value/1000)
         
         #self.power_float = self.volt_float * self.curr_float
         #self.power_float = round(self.power_float,3)
@@ -72,3 +74,7 @@ def update_data(self):
         self.cal_value = (self.energy) * 860.421
         self.cal_value = round(self.cal_value, 3)
         self.cal_read.setText( str(self.cal_value) + " kcal")
+
+        outList = [x06, self.relay] 
+        outBound = bytes(outList)
+        ser.write[outBound]
