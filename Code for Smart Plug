@@ -15,7 +15,7 @@ import serial
 start= time.time()
 conn = sqlite3.connect(':memory:')
 c = conn.cursor()
-c.execute("""CREATE TABLE plugData(voltage real, current real, time real)""")
+c.execute("""CREATE TABLE plugData(current real, voltage real, time real)""")
 c.execute("SELECT * FROM pedaling WHERE time != 0") #for degugging prints all from database
 #print(c.fetchall())
 conn.commit()
@@ -28,12 +28,14 @@ def update_data(self):
 
         #ser.write("rose") for testing
         ser.flush()
-        self.input= ser.readline()
-        self.volt_value= self.input.split(' ')[0] #change this to match the byte design you made
-        self.curr_value= self.input.split(' ')[1]
-        self.curr_value= self.curr_value.split('\n')[0]
-        self.curr_float = float(self.curr_value)
-        self.volt_float = float(self.volt_value)
+        self.input = ser.read(9) // Returns 9 bytes read as a bytes variable
+        self.volt_value = (self.input[1] << 8) + (self.input[2]) #change this to match the byte design you made
+        self.curr_value = (self.input[3] << 8) + (self.input[4])
+        self.time_value = (self.input[5] << 24) + (self.input[6] << 16) +\
+                          (self.input[7] << 8) + self.input[8]
+        self.curr_float = float(self.curr_value/1000)
+        self.volt_float = float(self.volt_value/1000)
+        self.time_float = float(self.time_value/1000)
         
         #self.power_float = self.volt_float * self.curr_float
         #self.power_float = round(self.power_float,3)
@@ -45,30 +47,27 @@ def update_data(self):
         #Writing to the Database example
     
         point= time.time() - start
-        c.execute("""INSERT INTO pedaling (power, time)  VALUES(?,?)""", (self.power_float, point))
+        c.execute("""INSERT INTO plugData (current, voltage, time)  VALUES(?,?)""", (self.power_float, point))
         conn.commit()
         
-        c.execute("SELECT * FROM pedaling")
+        c.execute("SELECT * FROM plugData)
         records =c.fetchall()
-        self.pwr = []
+        
+        self.cur = []
         for column in records:
-            self.pwr.append(column[0])
+            self.cur.append(column[0])
        
+       self.volt = []
+       for column in records
+            self.volt.append(column[1])
 
         self.tme = []
         for column in records:
-            self.tme.append(column[1])
+            self.tme.append(column[2])
       
 
-        self.energy = np.trapz( self.pwr, x= self.tme)
-        self.energy = self.energy /(60 * 60) #to convert to hours
        
-        self.cost_value = self.energy * .0873
-        self.cost_value = round(self.cost_value, 4)
-        self.cost_read.setText("$" + str( self.cost_value))
-       
-
-        ## Calorie calculations (860.421 kcal/ kWh)
-        self.cal_value = (self.energy) * 860.421
-        self.cal_value = round(self.cal_value, 3)
-        self.cal_read.setText( str(self.cal_value) + " kcal")
+     
+        outList = [x06, self.relay] 
+        outBound = bytes(outList)
+        ser.write[outBound]
