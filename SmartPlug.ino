@@ -69,16 +69,16 @@ void loop() {
     Serial.print(V_out,3); // the '3' after voltage allows you to display 3 digits after decimal point
     */
    
-    msg_out[LENGTHO - 8] = (byte)((supplyVoltage*1000) >> 8);
+    msg_out[LENGTHO - 8] = ((byte)(supplyVoltage*1000) >> 8);
     msg_out[LENGTHO - 7] = (byte)(supplyVoltage*1000);
       
-    msg_out[LENGTHO - 6] = (byte)((current*1000) >> 8);
+    msg_out[LENGTHO - 6] = ((byte)(current*1000) >> 8);
     msg_out[LENGTHO - 5] = (byte)(current*1000);
    
    
-    msg_out[LENGTHO - 4] = (byte)(curTime >> 24);
-    msg_out[LENGTHO - 3] = (byte)(curTime >> 16);
-    msg_out[LENGTHO - 2] = (byte)(curTime >> 8);
+    msg_out[LENGTHO - 4] = ((byte)curTime >> 24);
+    msg_out[LENGTHO - 3] = ((byte)curTime >> 16);
+    msg_out[LENGTHO - 2] = ((byte)curTime >> 8);
     msg_out[LENGTHO - 1] = (byte)(curTime);
    
    /*
@@ -104,9 +104,9 @@ Serial.println(digitalRead(5));
   */
 
 if(Serial.available() > (LENGTHI - 1)){ // While there is a message on the serial port
-  Serial.readBytes(msg_in, LENGTHI);
+  Serial.readBytes((char*)msg_in, LENGTHI);
   
-    relayOn = if (msg_in[LENGTHI-1] > 0);
+    if (msg_in[LENGTHI-1] > 0) relayOn = 1;
   /*
   char recv = Serial.read(); // log the current message
   if(recv == '\n'){ // If it's the end of the message
