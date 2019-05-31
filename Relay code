@@ -1,0 +1,25 @@
+   while(Serial.available() > 0) // While there is a message on the serial port
+{
+char recv = Serial.read(); // log the current message
+if(recv == '\n') // If it's the end of the message
+{
+//Print the message
+    Serial.print("Received: ");
+    Serial.println(m);
+
+  if(m == "CLOSE" || m=="C") {
+        digitalWrite(2,LOW);
+    }
+  else if(m == "OPEN"  || m=="O"){
+        digitalWrite(2,HIGH);
+    }
+     m = ""; // Clear the message
+      break;
+
+}
+else // Not at the end of the message
+{
+m += recv; // Append the next character onto the message string
+}
+}
+}
