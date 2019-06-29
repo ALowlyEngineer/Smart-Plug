@@ -26,7 +26,7 @@ c.execute("SELECT * FROM plugData WHERE time != 0") #for degugging prints all fr
 conn.commit()
 
 ser = serial.Serial('/dev/ttyACM0')  # open serial port
-ser.baudrate = 9600
+ser.baudrate = 115200
 ser.flushInput()
 #print(ser.name)         # check which port was really used
 
@@ -67,21 +67,13 @@ def update_data():
         print(inputString)
        
         timeBoi = str(inputString.split()[0])
-        currBoi = str(inputString.split()[1])
+        analogBoi = str(inputString.split()[1])
         voltBoi = str(inputString.split()[2])
-        '''
-        tme = str(timeBoi)
-        current = str(currBoi)
-        voltage = str(voltBoi)
         
-        tm_float = float(timeBoi)
-        cr_float = float(currBoi)
-        v_float = float(voltBoi)
-
-        tme = str(tm_float)
-        current = str(cr_float)
-        voltage = str(v_float)
-        '''       
+        v_out = (rawValue/1024.00000)*4.8000
+        currBoi= 40.0000(v_out - 2.480000)
+        currBoi = string(currBoi)
+        
         data.append([timeBoi, currBoi, voltBoi])
 
         print(data)
