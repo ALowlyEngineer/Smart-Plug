@@ -1,0 +1,60 @@
+#define CURRENTPIN 0
+#define VOLTAGEPIN 5
+#define RELAY 2
+#define BAUDRATE 115200
+
+String send2pi;
+float rawValueI = 0.000;
+float rawValueV = 0.000;
+float filteredV = 0.000;
+float v_out = 0.000; 
+float current = 0.000;
+float curTime = 0.000;
+float voltTime = 0.000;
+float currArray[140];
+float voltArray[140];
+float v = 0.00;
+int i = 0;
+int j = 0;
+int k = 42;
+
+void setup() {
+  
+  Serial.begin(BAUDRATE);
+  pinMode(RELAY, OUTPUT);
+  pinMode(CURRENTPIN, INPUT);
+  pinMode(VOLTAGEPIN, INPUT);
+
+}
+
+void loop() {
+delay(15000);
+for ( i ; i < 140; i++){
+          
+          rawValueI = analogRead(CURRENTPIN);
+          curTime = micros();
+          rawValueV = analogRead(VOLTAGEPIN);
+          voltTime = micros();
+          
+          filteredV = (rawValueV - 512); 
+          v =  372 * (filteredV/511);
+        
+          v_out = (rawValueI/1024.0000000)*4.80000;
+          current = -40.00000 * (v_out - 2.470000); 
+                  
+          currArray[i] = v;
+          voltArray[i] = current;
+        
+   }
+
+      for ( j; j < 140 ; j++){
+        
+        send2pi = String(currArray[j]) + " " + String(voltArray[j]);  
+
+        Serial.println(send2pi);
+        delay(5);
+      }
+   
+}
+
+  
