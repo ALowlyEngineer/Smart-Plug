@@ -39,10 +39,11 @@ void loop() {
 delay(15000);
 for ( i ; i < 140; i++){
           
-          rawValueI = analogRead(CURRENTPIN);
           curTime = micros();
-          rawValueV = analogRead(VOLTAGEPIN);
+          rawValueI = analogRead(CURRENTPIN);
           voltTime = micros();
+          rawValueV = analogRead(VOLTAGEPIN);
+          
           
           filteredV = (rawValueV - 512); 
           v =  372 * (filteredV/511);
