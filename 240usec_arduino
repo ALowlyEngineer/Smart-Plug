@@ -1,3 +1,11 @@
+/*
+This code stores the voltage and current every 240usecs. 
+I noticed a pattern when testing that the same time data is collected everytime, 
+so I created a time collecting code to get very accurate times for when the current
+and voltage are measured. Then I will use that collected data for the different 
+loads. This saves significant space on the arduino. So that this code can collect
+2 complete cycles of the waveform. */
+
 #define CURRENTPIN 0
 #define VOLTAGEPIN 5
 #define RELAY 2
